@@ -19,10 +19,10 @@ export const prisma = new PrismaClient();
 RegisterSubscribers();
 
 app
-  .get("/", function handler(_, res) {
+  .get("/", (_, res) => {
     res.status(200);
   })
-  .get("/connect", async function handler(_, res) {
+  .get("/connect", async (_, res) => {
     await connection.connect({
       address: "192.168.1.223",
       tls: false,
@@ -32,4 +32,47 @@ app
 
     res.json(connection.url);
   })
+
+  //API Routes,
+
+  .get("/nodes", async (_, res) => {
+    res.json(
+      await prisma.node.findMany({
+        include: {
+          position: true,
+        },
+      })
+    );
+  })
+  .get("/positions", async (_, res) => {
+    res.json(await prisma.position.findMany());
+  })
+  .get("/node/:id", async (req, res) => {
+    res.json(
+      await prisma.node.findUnique({
+        where: {
+          id: req.params.id,
+        },
+      })
+    );
+  })
+  .get("/node/:id/position", async (req, res) => {
+    res.json(
+      await prisma.node.findUnique({
+        where: {
+          id: req.params.id,
+        },
+      })
+    );
+  })
+  .get("/node/:id/positions", async (req, res) => {
+    res.json(
+      await prisma.node.findUnique({
+        where: {
+          id: req.params.id,
+        },
+      })
+    );
+  })
+
   .listen(3000, () => console.log("Started on http://localhost:3000"));

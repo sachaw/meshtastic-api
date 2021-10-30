@@ -1,5 +1,10 @@
-import { Protobuf } from '../node_modules/@meshtastic/meshtasticjs/dist/index.js';
+import { Protobuf } from '@meshtastic/meshtasticjs';
+import type { Hardware as HardwareType } from '@prisma/client';
+import pkg from '@prisma/client';
+
 import { connection, prisma } from './index.js';
+
+const { Hardware } = pkg;
 
 const addNode = async (node: Protobuf.NodeInfo): Promise<void> => {
   await prisma.node.upsert({
@@ -12,6 +17,11 @@ const addNode = async (node: Protobuf.NodeInfo): Promise<void> => {
       nodeId: node.user?.id,
       longName: node.user?.longName,
       shortName: node.user?.shortName,
+      hardware: node.user?.hwModel
+        ? Hardware[
+            Protobuf.HardwareModel[node.user?.hwModel ?? 0] as HardwareType
+          ]
+        : undefined,
     },
     update: {
       lastHeard: new Date(node.lastHeard),
@@ -39,15 +49,27 @@ const addPosition = async (
   position: Protobuf.Position,
   nodeNum: number
 ): Promise<void> => {
-  await prisma.position.create({
+  const newPosition = await prisma.position.create({
     data: {
-      lat: position.latitudeI,
-      lon: position.longitudeI,
-      alt: position.altitude,
-      batt: position.batteryLevel,
+      latitude: position.latitudeI,
+      longitude: position.longitudeI,
+      altitude: position.altitude,
+      batteryLevel: position.batteryLevel,
       node: {
         connect: {
           number: nodeNum,
+        },
+      },
+    },
+  });
+  await prisma.node.update({
+    where: {
+      number: nodeNum,
+    },
+    data: {
+      position: {
+        connect: {
+          id: newPosition.id,
         },
       },
     },

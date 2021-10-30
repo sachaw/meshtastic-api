@@ -6,12 +6,12 @@
   },
   "devDependencies": {
     "@types/node": "^16.11.6",
-    "tsm": "^2.1.0"
+    "tsm": "^2.1.4"
   },
   "dependencies": {
-    "@meshtastic/meshtasticjs": "^0.6.19",
+    "@meshtastic/meshtasticjs": "^0.6.21",
     "@prisma/client": "^3.3.0",
-    "@tinyhttp/app": "^2.0.11",
+    "@tinyhttp/app": "^2.0.12",
     "prisma": "^3.3.0"
   }
 }

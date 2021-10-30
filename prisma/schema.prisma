@@ -29,20 +29,22 @@ enum Hardware {
 }
 
 model Node {
-    id        String     @id @default(cuid())
-    createdAt DateTime   @default(now())
-    updatedAt DateTime   @updatedAt
-    number    Int        @unique
-    lastHeard DateTime
-    positions Position[]
-    snr       SNR[]
-    nodeId    String?
-    longName  String?
-    shortName String?
-    mac       String?
-    hardware  Hardware?
-    sent      Message[]  @relation(name: "sent")
-    received  Message[]  @relation(name: "received")
+    id              String     @id @default(cuid())
+    createdAt       DateTime   @default(now())
+    updatedAt       DateTime   @updatedAt
+    number          Int        @unique
+    lastHeard       DateTime
+    position        Position?  @relation(name: "position", fields: [positionId], references: [id])
+    positionId      String?
+    positionHistory Position[] @relation(name: "positionHisotry")
+    snr             SNR[]
+    nodeId          String?
+    longName        String?
+    shortName       String?
+    mac             String?
+    hardware        Hardware?
+    sent            Message[]  @relation(name: "sent")
+    received        Message[]  @relation(name: "received")
 }
 
 model SNR {
@@ -55,16 +57,17 @@ model SNR {
 }
 
 model Position {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    lat       Float?
-    lon       Float?
-    alt       Float?
-    batt      Int?
+    id           String   @id @default(cuid())
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    latitude     Float?
+    longitude    Float?
+    altitude     Float?
+    batteryLevel Int?
 
-    node   Node   @relation(fields: [nodeId], references: [id])
+    node   Node   @relation(name: "positionHisotry", fields: [nodeId], references: [id])
     nodeId String
+    Node   Node[] @relation("position")
 }
 
 model Message {
