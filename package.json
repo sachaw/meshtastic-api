@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsm src/index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.6",
+    "tsm": "^2.1.0"
+  },
+  "dependencies": {
+    "@meshtastic/meshtasticjs": "^0.6.19",
+    "@prisma/client": "^3.3.0",
+    "@tinyhttp/app": "^2.0.11",
+    "prisma": "^3.3.0"
+  }
+}

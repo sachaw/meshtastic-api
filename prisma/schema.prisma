@@ -1,0 +1,79 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+enum Hardware {
+    TLORA_V2
+    TLORA_V1
+    TLORA_V2_1_1p6
+    TBEAM
+    HELTEC_V2_0
+    TBEAM0p7
+    T_ECHO
+    TLORA_V1_1p3
+    RAK4631
+    HELTEC_V2_1
+    LORA_RELAY_V1
+    NRF52840DK
+    PPR
+    GENIEBLOCKS
+    NRF52_UNKNOWN
+    PORTDUINO
+    ANDROID_SIM
+    DIY_V1
+}
+
+model Node {
+    id        String     @id @default(cuid())
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+    number    Int        @unique
+    lastHeard DateTime
+    positions Position[]
+    snr       SNR[]
+    nodeId    String?
+    longName  String?
+    shortName String?
+    mac       String?
+    hardware  Hardware?
+    sent      Message[]  @relation(name: "sent")
+    received  Message[]  @relation(name: "received")
+}
+
+model SNR {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    snr       Float
+    node      Node     @relation(fields: [nodeId], references: [id])
+    nodeId    String
+}
+
+model Position {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    lat       Float?
+    lon       Float?
+    alt       Float?
+    batt      Int?
+
+    node   Node   @relation(fields: [nodeId], references: [id])
+    nodeId String
+}
+
+model Message {
+    id         String   @id @default(cuid())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    from       Node     @relation(name: "sent", fields: [fromUserId], references: [id])
+    to         Node     @relation(name: "received", fields: [toUserId], references: [id])
+    toUserId   String
+    message    String
+    fromUserId String
+}
