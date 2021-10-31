@@ -9,7 +9,7 @@ specifiers:
   tsm: ^2.1.4
 
 dependencies:
-  '@meshtastic/meshtasticjs': 0.6.21
+  '@meshtastic/meshtasticjs': link:../meshtastic.js
   '@prisma/client': 3.3.0_prisma@3.3.0
   '@tinyhttp/app': 2.0.12
   prisma: 3.3.0
@@ -19,14 +19,6 @@ devDependencies:
   tsm: 2.1.4
 
 packages:
-
-  /@meshtastic/meshtasticjs/0.6.21:
-    resolution: {integrity: sha512-Evr/aMv+XkTvOse0P39PjExJN3uhlJ+3k5AaXbQTvzaWSOhuwpmf3n9y8uGzH7QJEgt9pJSgFR0HX2JgR9Znyg==}
-    dependencies:
-      '@protobuf-ts/runtime': 2.0.7
-      node-fetch: 3.0.0
-      sub-events: 1.8.9
-    dev: false
 
   /@prisma/client/3.3.0_prisma@3.3.0:
     resolution: {integrity: sha512-34tonDW2v74VcG1mx+k/IUGG/eSHKwDiYKfFIZgaPLq/C0h8YQxh7pro272xpOf1pt6duX1Bi90dpGijh1MYgQ==}
@@ -49,10 +41,6 @@ packages:
   /@prisma/engines/3.3.0-30.33838b0f78f1fe9052cf9a00e9761c9dc097a63c:
     resolution: {integrity: sha512-T3nEnRWmoneNZJPd9IBR29G8ZDUjNelA8+cG5y8/lh6vySm6ryWSNxj1s377U9YzFYyZmXiA9vK1iyxMoRff/g==}
     requiresBuild: true
-    dev: false
-
-  /@protobuf-ts/runtime/2.0.7:
-    resolution: {integrity: sha512-jT8FYEX7NkAzxZXVjshIhtCV/ReuZm/3sCH0GWnaa8woy9VG+He0N+dpj2svaJbkdUThSxJE3zwmJcH0/3vEsw==}
     dev: false
 
   /@tinyhttp/accepts/2.0.4:
@@ -170,11 +158,6 @@ packages:
   /@types/node/16.11.6:
     resolution: {integrity: sha512-ua7PgUoeQFjmWPcoo9khiPum3Pd60k4/2ZGXt18sm2Slk0W0xZTqt5Y0Ny1NyBiN1EVQ/+FaF9NcY4Qe6rwk5w==}
     dev: true
-
-  /data-uri-to-buffer/3.0.1:
-    resolution: {integrity: sha512-WboRycPNsVw3B3TL559F7kuBUM4d8CgMEvk6xEJlOp7OBPjt6G7z8WMWlD2rOFZLk6OYfFIUGsCOWzcQH9K2og==}
-    engines: {node: '>= 6'}
-    dev: false
 
   /es-content-type/0.1.0:
     resolution: {integrity: sha512-DqWU9pSzhNlO10q+NQ/KebImLkKbwbcy0pSv3hNQfEpKFHsrqDJz2vajpZdq7nkiG9DoJcTh22oHGymp7XJd9g==}
@@ -363,13 +346,6 @@ packages:
       esbuild-windows-arm64: 0.13.11
     dev: true
 
-  /fetch-blob/3.1.2:
-    resolution: {integrity: sha512-hunJbvy/6OLjCD0uuhLdp0mMPzP/yd2ssd1t2FCJsaA7wkWhpbp9xfuNVpv7Ll4jFhzp6T4LAupSiV9uOeg0VQ==}
-    engines: {node: ^12.20 || >= 14.13}
-    dependencies:
-      web-streams-polyfill: 3.1.1
-    dev: false
-
   /header-range-parser/1.1.1:
     resolution: {integrity: sha512-aVuAHdlgxPCMkOtKTdUoH72eAHEAqmZqA+oQxvDv1DkYS50KgCt218AYd89/+Pd7+TFQimzn/9LNVfUPEBbRDQ==}
     engines: {node: '>=12.22.0'}
@@ -390,14 +366,6 @@ packages:
     engines: {node: '>= 0.6'}
     dev: false
 
-  /node-fetch/3.0.0:
-    resolution: {integrity: sha512-bKMI+C7/T/SPU1lKnbQbwxptpCrG9ashG+VkytmXCPZyuM9jB6VU+hY0oi4lC8LxTtAeWdckNCTa3nrGsAdA3Q==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-    dependencies:
-      data-uri-to-buffer: 3.0.1
-      fetch-blob: 3.1.2
-    dev: false
-
   /prisma/3.3.0:
     resolution: {integrity: sha512-E7C9mXRwZVpcnSeJT533qGHUVrYULsE9ihFvAtQMuxhTXkxoRlMLyo/1ZOyeu9GdXP8DJ7ruLOw06kEs/N3dVg==}
     engines: {node: '>=12.6'}
@@ -412,11 +380,6 @@ packages:
     engines: {node: '>=8'}
     dev: false
 
-  /sub-events/1.8.9:
-    resolution: {integrity: sha512-RhhA2amqVzL6nO+aiZOqxBCgcA3ZLfp4W9iHFUELwq8132TS7pUReJV+bcRjtNKdqm/Ep1sD/h01eAcTBtgrBQ==}
-    engines: {node: '>=10.0.0'}
-    dev: false
-
   /tsm/2.1.4:
     resolution: {integrity: sha512-gz1zckplzOzHdiY1HVVUoH8bl2eWxbU6uJraB31w1NQ+/kQkjix3ldYHBnWaoNnOL9q8ruS+E2Wckdcw56DzrA==}
     engines: {node: '>=12'}
@@ -424,8 +387,3 @@ packages:
     dependencies:
       esbuild: 0.13.11
     dev: true
-
-  /web-streams-polyfill/3.1.1:
-    resolution: {integrity: sha512-Czi3fG883e96T4DLEPRvufrF2ydhOOW1+1a6c3gNjH2aIh50DNFBdfwh2AKoOf1rXvpvavAoA11Qdq9+BKjE0Q==}
-    engines: {node: '>= 8'}
-    dev: false

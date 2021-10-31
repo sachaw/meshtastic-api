@@ -1,3 +1,5 @@
+import { TextDecoder } from 'util';
+
 import { Protobuf } from '@meshtastic/meshtasticjs';
 import type { Hardware as HardwareType } from '@prisma/client';
 import pkg from '@prisma/client';
@@ -13,23 +15,20 @@ const addNode = async (node: Protobuf.NodeInfo): Promise<void> => {
     },
     create: {
       number: node.num,
-      lastHeard: new Date(node.lastHeard),
-      nodeId: node.user?.id,
-      longName: node.user?.longName,
-      shortName: node.user?.shortName,
-      hardware: node.user?.hwModel
-        ? Hardware[
-            Protobuf.HardwareModel[node.user?.hwModel ?? 0] as HardwareType
-          ]
-        : undefined,
+      lastHeard: new Date(node.lastHeard * 1000),
     },
     update: {
-      lastHeard: new Date(node.lastHeard),
-      nodeId: node.user?.id,
-      longName: node.user?.longName,
-      shortName: node.user?.shortName,
+      lastHeard: new Date(node.lastHeard * 1000),
     },
   });
+
+  if (node.user) {
+    addUser(node.user, node.num);
+  }
+
+  if (node.position) {
+    addPosition(node.position, node.num);
+  }
 
   if (node.num !== 0xffffffff) {
     await prisma.sNR.create({
@@ -45,14 +44,53 @@ const addNode = async (node: Protobuf.NodeInfo): Promise<void> => {
   }
 };
 
+const addUser = async (user: Protobuf.User, nodeNum: number): Promise<void> => {
+  await prisma.user.upsert({
+    where: {
+      userId: user.id,
+    },
+    create: {
+      userId: user.id,
+      longName: user.longName,
+      shortName: user.shortName,
+      hardware: user.hwModel
+        ? Hardware[Protobuf.HardwareModel[user.hwModel ?? 0] as HardwareType]
+        : Hardware.ANDROID_SIM,
+      node: {
+        connect: {
+          number: nodeNum,
+        },
+      },
+      mac:
+        Buffer.from(user.macaddr)
+          .toString("hex")
+          .match(/.{1,2}/g)
+          ?.join(":") ?? "",
+    },
+    update: {
+      longName: user.longName,
+      shortName: user.shortName,
+    },
+  });
+};
+
 const addPosition = async (
   position: Protobuf.Position,
   nodeNum: number
 ): Promise<void> => {
+  if (
+    position.latitudeI === 0 &&
+    position.longitudeI === 0 &&
+    position.altitude === 0 &&
+    position.batteryLevel === 0
+  ) {
+    return;
+  }
+
   const newPosition = await prisma.position.create({
     data: {
-      latitude: position.latitudeI,
-      longitude: position.longitudeI,
+      latitude: position.latitudeI / 1e7,
+      longitude: position.longitudeI / 1e7,
       altitude: position.altitude,
       batteryLevel: position.batteryLevel,
       node: {
@@ -116,6 +154,7 @@ export const RegisterSubscribers = () => {
     await prisma.message.create({
       data: {
         message: packet.data,
+        packetId: packet.packet.id,
         from: {
           connect: {
             number: packet.packet.from,
@@ -128,5 +167,18 @@ export const RegisterSubscribers = () => {
         },
       },
     });
+  });
+
+  connection.onPrivatePacket.subscribe(async (packet) => {
+    const msg = new TextDecoder().decode(packet.data);
+    // if (new RegExp()) {
+
+    // }
+
+    console.log("msg");
+  });
+
+  connection.onUserPacket.subscribe(async (packet) => {
+    await addUser(packet.data, packet.packet.from);
   });
 };

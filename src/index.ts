@@ -29,7 +29,6 @@ app
       receiveBatchRequests: false,
       fetchInterval: 2000,
     });
-
     res.json(connection.url);
   })
 

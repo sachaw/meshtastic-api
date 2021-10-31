@@ -36,15 +36,25 @@ model Node {
     lastHeard       DateTime
     position        Position?  @relation(name: "position", fields: [positionId], references: [id])
     positionId      String?
+    user            User?      @relation(fields: [userId], references: [id])
+    userId          String?    @unique
     positionHistory Position[] @relation(name: "positionHisotry")
     snr             SNR[]
-    nodeId          String?
-    longName        String?
-    shortName       String?
-    mac             String?
-    hardware        Hardware?
     sent            Message[]  @relation(name: "sent")
     received        Message[]  @relation(name: "received")
+}
+
+model User {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    userId    String   @unique
+    longName  String
+    shortName String
+    mac       String
+    hardware  Hardware
+
+    node Node?
 }
 
 model SNR {
@@ -78,5 +88,6 @@ model Message {
     to         Node     @relation(name: "received", fields: [toUserId], references: [id])
     toUserId   String
     message    String
+    packetId   Int
     fromUserId String
 }
