@@ -3,18 +3,16 @@ import {
   Protobuf,
   SettingsManager,
 } from '@meshtastic/meshtasticjs';
-import pkg from '@prisma/client';
 import { App } from '@tinyhttp/app';
 
+import { handlePacket } from './connections.js';
 import { RegisterSubscribers } from './events.js';
-
-const { PrismaClient } = pkg;
+import { prisma } from './prisma.js';
 
 const app = new App();
 
 SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
 export const connection = new IHTTPConnection();
-export const prisma = new PrismaClient();
 
 RegisterSubscribers();
 
@@ -24,7 +22,7 @@ app
   })
   .get("/connect", async (_, res) => {
     await connection.connect({
-      address: "192.168.1.223",
+      address: "192.168.1.216",
       tls: false,
       receiveBatchRequests: false,
       fetchInterval: 2000,
@@ -72,6 +70,11 @@ app
         },
       })
     );
+  })
+
+  .post("/ingest", (req, res) => {
+    const packet = JSON.parse(req.body);
+    handlePacket(packet);
   })
 
   .listen(3000, () => console.log("Started on http://localhost:3000"));

@@ -4,7 +4,8 @@ import { Protobuf } from '@meshtastic/meshtasticjs';
 import type { Hardware as HardwareType } from '@prisma/client';
 import pkg from '@prisma/client';
 
-import { connection, prisma } from './index.js';
+import { connection } from './index.js';
+import { prisma } from './prisma.js';
 
 const { Hardware } = pkg;
 
@@ -83,6 +84,26 @@ const addPosition = async (
     position.longitudeI === 0 &&
     position.altitude === 0 &&
     position.batteryLevel === 0
+  ) {
+    return;
+  }
+
+  const oldPosition = (
+    await prisma.node.findUnique({
+      where: {
+        number: nodeNum,
+      },
+      include: {
+        position: true,
+      },
+    })
+  )?.position;
+
+  if (
+    !oldPosition ||
+    (oldPosition.latitude === position.latitudeI &&
+      oldPosition.longitude === position.longitudeI &&
+      oldPosition.altitude === position.altitude)
   ) {
     return;
   }
@@ -171,11 +192,43 @@ export const RegisterSubscribers = () => {
 
   connection.onPrivatePacket.subscribe(async (packet) => {
     const msg = new TextDecoder().decode(packet.data);
-    // if (new RegExp()) {
+    // @todo check what happens when sending junk
+    // check structure
+    console.log(msg);
 
-    // }
+    const lastMsg = await prisma.message.findUnique({
+      where: { packetId: Number(msg) },
+    });
 
-    console.log("msg");
+    console.log(
+      await prisma.message.findUnique({
+        where: { packetId: Number(msg) },
+      })
+    );
+
+    if (!lastMsg) {
+      return;
+    }
+
+    const toSend = await prisma.message.findMany({
+      where: {
+        createdAt: {
+          not: lastMsg.createdAt,
+          gt: lastMsg.createdAt,
+        },
+        to: {
+          OR: [
+            {
+              number: packet.packet.from,
+            },
+            {
+              number: -1,
+            },
+          ],
+        },
+      },
+    });
+    console.log(toSend);
   });
 
   connection.onUserPacket.subscribe(async (packet) => {

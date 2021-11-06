@@ -29,11 +29,12 @@ enum Hardware {
 }
 
 model Node {
-    id              String     @id @default(cuid())
-    createdAt       DateTime   @default(now())
-    updatedAt       DateTime   @updatedAt
-    number          Int        @unique
-    lastHeard       DateTime
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    number    Int      @unique
+    lastHeard DateTime
+
     position        Position?  @relation(name: "position", fields: [positionId], references: [id])
     positionId      String?
     user            User?      @relation(fields: [userId], references: [id])
@@ -42,6 +43,10 @@ model Node {
     snr             SNR[]
     sent            Message[]  @relation(name: "sent")
     received        Message[]  @relation(name: "received")
+    peer            Peer?      @relation(fields: [peerId], references: [id])
+    peerId          String?
+
+
 }
 
 model User {
@@ -62,8 +67,9 @@ model SNR {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     snr       Float
-    node      Node     @relation(fields: [nodeId], references: [id])
-    nodeId    String
+
+    node   Node   @relation(fields: [nodeId], references: [id])
+    nodeId String
 }
 
 model Position {
@@ -75,19 +81,37 @@ model Position {
     altitude     Float?
     batteryLevel Int?
 
-    node   Node   @relation(name: "positionHisotry", fields: [nodeId], references: [id])
+    node   Node    @relation(name: "positionHisotry", fields: [nodeId], references: [id])
     nodeId String
-    Node   Node[] @relation("position")
+    Node   Node[]  @relation("position")
+    peer   Peer?   @relation(fields: [peerId], references: [id])
+    peerId String?
 }
 
 model Message {
     id         String   @id @default(cuid())
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
-    from       Node     @relation(name: "sent", fields: [fromUserId], references: [id])
-    to         Node     @relation(name: "received", fields: [toUserId], references: [id])
     toUserId   String
     message    String
-    packetId   Int
+    packetId   Int      @unique
     fromUserId String
+
+    from   Node    @relation(name: "sent", fields: [fromUserId], references: [id])
+    to     Node    @relation(name: "received", fields: [toUserId], references: [id])
+    peer   Peer?   @relation(fields: [peerId], references: [id])
+    peerId String?
+}
+
+model Peer {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    name      String
+    ip        String
+    psk       String
+
+    nodes     Node[]
+    messages  Message[]
+    positions Position[]
 }
